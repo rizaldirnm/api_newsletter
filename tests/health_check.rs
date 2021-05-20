@@ -1,5 +1,8 @@
 use std::net::TcpListener;
 
+use sqlx::{Connection, PgConnection};
+use zero2prod::configuration::get_configuration;
+
 
 // `actix_rt::test` is the testing equivalent of `actix_web::main`.
 // It also spares you from having to specify the `#[test]` attribute.
@@ -37,6 +40,14 @@ async fn health_check_works() {
 async fn subscribe_returns_a_200_for_valid_form_data() {
     // Arrange
     let address = spawn_app();
+
+    let configuration = get_configuration().expect("Failed to read configuration");
+    let connect_db_string = configuration.database.connection_string();
+
+    // Connec to posgres
+    let _ = PgConnection::connect(&connect_db_string)
+      .await
+      .expect("Failed to connect to Postgres.");
 
     let client = reqwest::Client::new();
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
