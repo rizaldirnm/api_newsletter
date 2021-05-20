@@ -4,6 +4,51 @@ version = "0.1.0"
 authors = ["rizaldidev"]
 edition = "2018"
 
+[lib]
+# We could use any path here, but we are following the community convention
+# We could specify a library name using the `name` field. If unspecified,
+# cargo will default to `package.name`, which is what we want.
+path = "src/lib.rs"
+
+# Notice the double square brackets: it's an array in TOML's syntax.
+# We can only have one library in a project, but we can have multiple binaries!
+# If you want to manage multiple libraries in the same repository
+# have a look at the workspace feature - we'll cover it later on.
+[[bin]]
+path = "src/main.rs"
+name = "zero2prod"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# We are using the latest beta release of actix-web
+# that relies on tokio 1.x.x
+# There is _some_ turbulence when working with betas,
+# we are pinning a few other supporting packages to ensure
+# compatibility.
+actix-web = "4.0.0-beta.5"
+actix-http = "=3.0.0-beta.5"
+actix-service = "=2.0.0-beta.5"
+reqwest = " 0.11.3"
+# We need the optional `derive` feature to use `serde`'s procedural macros:
+# `#[derive(Serialize)]` and `#[derive(Deserialize)]`.
+# The feature is not enabled by default to avoid pulling in
+# unnecessary dependencies for projects that do not need it.
+serde = { version = "1", features = ["derive"]}
+config = "0.11.0"
+
+[dependencies.sqlx]
+version = "0.5.1"
+default-features = false
+features = [
+  "runtime-actix-rustls",
+  "macros",
+  "postgres",
+  "uuid",
+  "chrono",
+  "migrate"
+]
+
+[dev-dependencies]
+actix-rt = "2"
+tokio = "1"
